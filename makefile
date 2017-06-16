@@ -4,8 +4,11 @@ make: a.out
 run: password.txt
 	
 
-a.out: passgen.c
-	gcc passgen.c
+debug:
+	gcc -ggdb3 passgen.cpp && gdb ./a.out
+
+a.out: passgen.cpp
+	gcc passgen.cpp
 
 password.txt: a.out
 	./a.out
