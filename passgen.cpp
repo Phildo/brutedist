@@ -36,13 +36,63 @@ int main(int argc, char **argv)
   int buff_i = 0;
   char valid_chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*";
   int n_valid_chars = strlen(valid_chars);
-  char *og_password_0[] = { "sanandreas" };
+  char *og_password_0[] = { "ыфтфтвкуфы" };
   int n_og_password_0 = 1;
-  char *og_password_1[] = {"", "96","1996","1492","1942","1608","25050602","1803","3103","0110"};
-  int n_og_password_1 = 10;
-  char *og_password_2[] = { "", "dancher", "doitcome", "DeusVult", "DeusVult" };
-  int n_og_password_2 = 5;
+  //char *og_password_1[] = {"", "96","1996","1492","1942","1608","25050602","1803","3103","0110"};
+  //int n_og_password_1 = 10;
+  int n_og_password_1 = 11111;
+  char *og_password_1_content = (char *)malloc(sizeof(char)*5*11111);
+  char **og_password_1 = (char **)malloc(sizeof(char *)*11111);
+  int v;
+  for(int i = 0; i < n_og_password_1; i++)
+  {
+    if(i < 1)
+    {
+      og_password_1_content[i*5+0] = '\0';
+    }
+    else if(i < 11)
+    {
+      v = i-1;
+      og_password_1_content[i*5+1] = '\0';
+      og_password_1_content[i*5+0] = '0'+v;
+    }
+    else if(i < 111)
+    {
+      v = i-11;
+      og_password_1_content[i*5+2] = '\0';
+      og_password_1_content[i*5+1] = '0'+(v%10);
+      og_password_1_content[i*5+0] = '0'+(v/10);
+    }
+    else if(i < 1111)
+    {
+      v = i-111;
+      og_password_1_content[i*5+3] = '\0';
+      og_password_1_content[i*5+2] = '0'+(v%10);
+      og_password_1_content[i*5+1] = '0'+(v/10)%10;
+      og_password_1_content[i*5+0] = '0'+(v/100);
+    }
+    else if(i < 11111)
+    {
+      v = i-1111;
+      og_password_1_content[i*5+4] = '\0';
+      og_password_1_content[i*5+3] = '0'+(v%10);
+      og_password_1_content[i*5+2] = '0'+(v/10)%10;
+      og_password_1_content[i*5+1] = '0'+(v/100)%10;
+      og_password_1_content[i*5+0] = '0'+(v/1000)%10;
+    }
+    og_password_1[i] = og_password_1_content+(i*5);
+  }
 
+  char *og_password_2[] = { "", "вфтсрук", "вщшесщьу", "вугымгде" };
+  int n_og_password_2 = 4;
+
+
+/*
+ыфтфтвкуфы96
+ыфтфтвкуфы96вфтсрук
+ыфтфтвкуфы96вщшесщьу
+ыфтфтвкуфы96вугымгде
+*/
 
   /*
   ыфтфтвкуфы = sanandreas?
@@ -83,6 +133,12 @@ int main(int argc, char **argv)
     og_password[       og_password_len_0[cur_og_password_0]+og_password_len_1[cur_og_password_1]+og_password_len_2[cur_og_password_2]] = '\0';
     og_password_len = strlen(og_password);
 
+    strcpy(new_password,og_password);
+    new_password[og_password_len] = '\n';
+    new_password[og_password_len+1] = '\0';
+    buff_i = appendPassword(new_password, buff, buff_i, fp);
+
+/*
     //try deletion
     cur_password_i = 0;
     done = 0;
@@ -102,7 +158,6 @@ int main(int argc, char **argv)
       buff_i = appendPassword(new_password, buff, buff_i, fp);
     }
 
-  /*
     //try substitution
     cur_password_i = 0;
     cur_char_i = 0;
