@@ -36,8 +36,9 @@ int main(int argc, char **argv)
   int buff_i = 0;
   char valid_chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*";
   int n_valid_chars = strlen(valid_chars);
-  char *og_password_0[] = { "ыфтфтвкуфы" };
-  int n_og_password_0 = 1;
+  //char *og_password_0[] = { "ыфтфтвкуфы" };
+  char *og_password_0[] = { "sanandreas" , "SanAndreas", "Sanandreas" };
+  int n_og_password_0 = 3;
   //char *og_password_1[] = {"", "96","1996","1492","1942","1608","25050602","1803","3103","0110"};
   //int n_og_password_1 = 10;
   int n_og_password_1 = 11111;
@@ -83,22 +84,12 @@ int main(int argc, char **argv)
     og_password_1[i] = og_password_1_content+(i*5);
   }
 
-  char *og_password_2[] = { "", "вфтсрук", "вщшесщьу", "вугымгде" };
-  int n_og_password_2 = 4;
+  //char *og_password_2[] = { "", "вфтсрук", "вщшесщьу", "вугымгде" };
+  char *og_password_2[] = { "", "dancher", "Dancher", "doitcome", "Doitcome", "ethereum", "Ethereum", "DeusVult", "deusvult" };
+  int n_og_password_2 = 9;
 
-
-/*
-ыфтфтвкуфы96
-ыфтфтвкуфы96вфтсрук
-ыфтфтвкуфы96вщшесщьу
-ыфтфтвкуфы96вугымгде
-*/
-
-  /*
-  ыфтфтвкуфы = sanandreas?
-  вфтсрук = dancher?
-  вщшесщьу = ddoitcome
-  */
+  char *og_password_3[] = { "", "*" };
+  int n_og_password_3 = 2;
 
   int og_password_len_0[n_og_password_0];
   for(int i = 0; i < n_og_password_0; i++)
@@ -109,8 +100,11 @@ int main(int argc, char **argv)
   int og_password_len_2[n_og_password_2];
   for(int i = 0; i < n_og_password_2; i++)
     og_password_len_2[i]= strlen(og_password_2[i]);
+  int og_password_len_3[n_og_password_3];
+  for(int i = 0; i < n_og_password_3; i++)
+    og_password_len_3[i]= strlen(og_password_3[i]);
 
-  char og_password[300]; //gets populated with every permutation of og_password_0og_password_1og_password_2
+  char og_password[300]; //gets populated with every permutation of og_password_0og_password_1og_password_2og_password_3
   int og_password_len;
   char new_password[300];
 
@@ -124,13 +118,15 @@ int main(int argc, char **argv)
   int cur_og_password_0 = 0;
   int cur_og_password_1 = 0;
   int cur_og_password_2 = 0;
+  int cur_og_password_3 = 0;
 
   while(!fully_done)
   {
-    strcpy(og_password,                                                                          og_password_0[cur_og_password_0]);
-    strcpy(og_password+og_password_len_0[cur_og_password_0],                                     og_password_1[cur_og_password_1]);
-    strcpy(og_password+og_password_len_0[cur_og_password_0]+og_password_len_1[cur_og_password_1],og_password_2[cur_og_password_2]);
-    og_password[       og_password_len_0[cur_og_password_0]+og_password_len_1[cur_og_password_1]+og_password_len_2[cur_og_password_2]] = '\0';
+    strcpy(og_password,                                                                                                               og_password_0[cur_og_password_0]);
+    strcpy(og_password+og_password_len_0[cur_og_password_0],                                                                          og_password_1[cur_og_password_1]);
+    strcpy(og_password+og_password_len_0[cur_og_password_0]+og_password_len_1[cur_og_password_1],                                     og_password_2[cur_og_password_2]);
+    strcpy(og_password+og_password_len_0[cur_og_password_0]+og_password_len_1[cur_og_password_1]+og_password_len_2[cur_og_password_2],og_password_3[cur_og_password_3]);
+    og_password[       og_password_len_0[cur_og_password_0]+og_password_len_1[cur_og_password_1]+og_password_len_2[cur_og_password_2]+og_password_len_3[cur_og_password_3]] = '\0';
     og_password_len = strlen(og_password);
 
     strcpy(new_password,og_password);
@@ -299,16 +295,21 @@ int main(int argc, char **argv)
     }
     */
 
-    cur_og_password_2++;
-    if(cur_og_password_2 >= n_og_password_2)
+    cur_og_password_3++;
+    if(cur_og_password_3 >= n_og_password_3)
     {
-      cur_og_password_2 = 0;
-      cur_og_password_1++;
-      if(cur_og_password_1 >= n_og_password_1)
+      cur_og_password_3 = 0;
+      cur_og_password_2++;
+      if(cur_og_password_2 >= n_og_password_2)
       {
-        cur_og_password_1 = 0;
-        cur_og_password_0++;
-        if(cur_og_password_0 >= n_og_password_0) fully_done = 1;
+        cur_og_password_2 = 0;
+        cur_og_password_1++;
+        if(cur_og_password_1 >= n_og_password_1)
+        {
+          cur_og_password_1 = 0;
+          cur_og_password_0++;
+          if(cur_og_password_0 >= n_og_password_0) fully_done = 1;
+        }
       }
     }
   }
