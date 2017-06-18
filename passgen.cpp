@@ -28,19 +28,101 @@ int appendPassword(char *pass, char *buff, int buff_i, FILE *fp) //pass must end
   return buff_i;
 }
 
+char smart_sub(int i, char key)
+{
+  char *c;
+  switch(key)
+  {
+    case 'a': c = "A4"; break;
+    case 'b': c = "B"; break;
+    case 'c': c = "C"; break;
+    case 'd': c = "D"; break;
+    case 'e': c = "E3"; break;
+    case 'f': c = "F"; break;
+    case 'g': c = "G"; break;
+    case 'h': c = "H"; break;
+    case 'i': c = "I!"; break;
+    case 'j': c = "J"; break;
+    case 'k': c = "K"; break;
+    case 'l': c = "L!Ii"; break;
+    case 'm': c = "M"; break;
+    case 'n': c = "N"; break;
+    case 'o': c = "O0"; break;
+    case 'p': c = "P"; break;
+    case 'q': c = "Q"; break;
+    case 'r': c = "R"; break;
+    case 's': c = "S5"; break;
+    case 't': c = "T"; break;
+    case 'u': c = "U"; break;
+    case 'v': c = "V"; break;
+    case 'w': c = "W"; break;
+    case 'x': c = "X"; break;
+    case 'y': c = "Y"; break;
+    case 'z': c = "Z"; break;
+    case 'A': c = "a4"; break;
+    case 'B': c = "b"; break;
+    case 'C': c = "c"; break;
+    case 'D': c = "d"; break;
+    case 'E': c = "e3"; break;
+    case 'F': c = "f"; break;
+    case 'G': c = "g"; break;
+    case 'H': c = "h"; break;
+    case 'I': c = "i!"; break;
+    case 'J': c = "j"; break;
+    case 'K': c = "k"; break;
+    case 'L': c = "l!Ii"; break;
+    case 'M': c = "m"; break;
+    case 'N': c = "n"; break;
+    case 'O': c = "o0"; break;
+    case 'P': c = "p"; break;
+    case 'Q': c = "q"; break;
+    case 'R': c = "r"; break;
+    case 'S': c = "s5"; break;
+    case 'T': c = "t"; break;
+    case 'U': c = "u"; break;
+    case 'V': c = "v"; break;
+    case 'W': c = "w"; break;
+    case 'X': c = "x"; break;
+    case 'Y': c = "y"; break;
+    case 'Z': c = "z"; break;
+    case '0': c = "oO"; break;
+    case '1': c = "i!"; break;
+    case '2': c = "zZ"; break;
+    case '3': c = "eE"; break;
+    case '4': c = "A"; break;
+    case '5': c = "Ss"; break;
+    case '6': c = ""; break;
+    case '7': c = "L"; break;
+    case '8': c = ""; break;
+    case '9': c = ""; break;
+    default: c = ""; break;
+  }
+  return c[i];
+}
+
 int main(int argc, char **argv)
 {
+  int try_deletion                  = 0;
+  int try_smart_substitution        = 1;
+  int try_substitution              = 0;
+  int try_injection                 = 0;
+  int try_double_smart_substitution = 1;
+  int try_double_substitution       = 0;
+  int try_substitution_injection    = 0;
+
   FILE *fp;
   fp = fopen("password.txt", "w+");
   char buff[BUFF_LEN];
   int buff_i = 0;
-  char valid_chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789*";
+  char valid_chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!";
   int n_valid_chars = strlen(valid_chars);
-  //char *og_password_0[] = { "ыфтфтвкуфы" };
-  char *og_password_0[] = { "sanandreas" , "SanAndreas", "Sanandreas" };
-  int n_og_password_0 = 3;
-  //char *og_password_1[] = {"", "96","1996","1492","1942","1608","25050602","1803","3103","0110"};
-  //int n_og_password_1 = 10;
+  char *og_password_0[] = { "test" };
+  int n_og_password_0 = 1;
+  char *og_password_1[] = {""};
+  int n_og_password_1 = 1;
+
+  /*
+  //populate n_og_password_1 with all combinations of 0-4 digit numbers
   int n_og_password_1 = 11111;
   char *og_password_1_content = (char *)malloc(sizeof(char)*5*11111);
   char **og_password_1 = (char **)malloc(sizeof(char *)*11111);
@@ -83,13 +165,13 @@ int main(int argc, char **argv)
     }
     og_password_1[i] = og_password_1_content+(i*5);
   }
+  */
 
-  //char *og_password_2[] = { "", "вфтсрук", "вщшесщьу", "вугымгде" };
-  char *og_password_2[] = { "", "dancher", "Dancher", "doitcome", "Doitcome", "ethereum", "Ethereum", "DeusVult", "deusvult" };
-  int n_og_password_2 = 9;
+  char *og_password_2[] = { "" };
+  int n_og_password_2 = 1;
 
-  char *og_password_3[] = { "", "*" };
-  int n_og_password_3 = 2;
+  char *og_password_3[] = { "" };
+  int n_og_password_3 = 1;
 
   int og_password_len_0[n_og_password_0];
   for(int i = 0; i < n_og_password_0; i++)
@@ -112,6 +194,10 @@ int main(int argc, char **argv)
   int cur_password_ii = 0;
   int cur_char_i = 0;
   int cur_char_ii = 0;
+  char sub_i;
+  char old_i;
+  char sub_ii;
+  char old_ii;
   int done = 0;
 
   int fully_done = 0;
@@ -134,167 +220,319 @@ int main(int argc, char **argv)
     new_password[og_password_len+1] = '\0';
     buff_i = appendPassword(new_password, buff, buff_i, fp);
 
-/*
     //try deletion
-    cur_password_i = 0;
-    done = 0;
-    while(!done)
-    //for(int i = 0; i < deletion_attempts; i++)
+    if(try_deletion)
     {
-      strcpy(new_password,og_password);
-      new_password[og_password_len] = '\n';
-      new_password[og_password_len+1] = '\0';
+      cur_password_i = 0;
+      done = 0;
+      while(!done)
+      //for(int i = 0; i < deletion_attempts; i++)
+      {
+        strcpy(new_password,og_password);
+        new_password[og_password_len] = '\n';
+        new_password[og_password_len+1] = '\0';
 
-      for(int j = cur_password_i; new_password[j] != '\0'; j++)
-        new_password[j] = new_password[j+1];
-      cur_password_i++;
-      if(cur_password_i >= og_password_len)
-        done = 1;
+        for(int j = cur_password_i; new_password[j] != '\0'; j++)
+          new_password[j] = new_password[j+1];
+        cur_password_i++;
+        if(cur_password_i >= og_password_len)
+          done = 1;
 
-      buff_i = appendPassword(new_password, buff, buff_i, fp);
+        buff_i = appendPassword(new_password, buff, buff_i, fp);
+      }
     }
 
-    //try substitution
-    cur_password_i = 0;
-    cur_char_i = 0;
-    done = 0;
-    while(!done)
-    //for(int i = 0; i < substitution_attempts; i++)
+    //try smart substitution
+    if(try_smart_substitution)
     {
-      strcpy(new_password,og_password);
-      new_password[og_password_len] = '\n';
-      new_password[og_password_len+1] = '\0';
-
-      new_password[cur_password_i] = valid_chars[cur_char_i];
-      cur_char_i++;
-      if(cur_char_i >= n_valid_chars)
+      cur_password_i = 0;
+      cur_char_i = 0;
+      done = 0;
+      //pre populate with valid positions
+      sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
+      while(sub_i == '\0' && !done)
       {
         cur_char_i = 0;
         cur_password_i++;
         if(cur_password_i >= og_password_len)
           done = 1;
+        else
+          sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
       }
-      buff_i = appendPassword(new_password, buff, buff_i, fp);
+      while(!done)
+      //for(int i = 0; i < substitution_attempts; i++)
+      {
+        strcpy(new_password,og_password);
+        new_password[og_password_len] = '\n';
+        new_password[og_password_len+1] = '\0';
+
+        sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
+        old_i = new_password[cur_password_i];
+        new_password[cur_password_i] = sub_i;
+        buff_i = appendPassword(new_password, buff, buff_i, fp);
+        new_password[cur_password_i] = old_i;
+
+        cur_char_i++;
+        sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
+        while(sub_i == '\0' && !done)
+        {
+          cur_char_i = 0;
+          cur_password_i++;
+          if(cur_password_i >= og_password_len)
+            done = 1;
+          else
+            sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
+        }
+      }
+    }
+
+    //try substitution
+    if(try_substitution)
+    {
+      cur_password_i = 0;
+      cur_char_i = 0;
+      done = 0;
+      while(!done)
+      //for(int i = 0; i < substitution_attempts; i++)
+      {
+        strcpy(new_password,og_password);
+        new_password[og_password_len] = '\n';
+        new_password[og_password_len+1] = '\0';
+
+        new_password[cur_password_i] = valid_chars[cur_char_i];
+        cur_char_i++;
+        if(cur_char_i >= n_valid_chars)
+        {
+          cur_char_i = 0;
+          cur_password_i++;
+          if(cur_password_i >= og_password_len)
+            done = 1;
+        }
+        buff_i = appendPassword(new_password, buff, buff_i, fp);
+      }
     }
 
     //try injection
-    cur_password_i = 0;
-    cur_char_i = 0;
-    done = 0;
-    while(!done)
-    //for(int i = 0; i < injection_attempts; i++)
+    if(try_injection)
     {
-      strcpy(new_password,og_password);
-      new_password[og_password_len] = '\n';
-      new_password[og_password_len+1] = '\0';
-
-      char tmp = new_password[cur_password_i];
-      char newtmp;
-      for(int j = cur_password_i; new_password[j] != '\0'; j++)
+      cur_password_i = 0;
+      cur_char_i = 0;
+      done = 0;
+      while(!done)
+      //for(int i = 0; i < injection_attempts; i++)
       {
-        newtmp = new_password[j+1];
-        new_password[j+1] = tmp;
-        tmp = newtmp;
+        strcpy(new_password,og_password);
+        new_password[og_password_len] = '\n';
+        new_password[og_password_len+1] = '\0';
+
+        char tmp = new_password[cur_password_i];
+        char newtmp;
+        for(int j = cur_password_i; new_password[j] != '\0'; j++)
+        {
+          newtmp = new_password[j+1];
+          new_password[j+1] = tmp;
+          tmp = newtmp;
+        }
+        new_password[cur_password_i] = valid_chars[cur_char_i];
+        cur_char_i++;
+        if(cur_char_i >= n_valid_chars)
+        {
+          cur_char_i = 0;
+          cur_password_i++;
+          if(cur_password_i >= og_password_len+1)
+            done = 1;
+        }
+        buff_i = appendPassword(new_password, buff, buff_i, fp);
       }
-      new_password[cur_password_i] = valid_chars[cur_char_i];
-      cur_char_i++;
-      if(cur_char_i >= n_valid_chars)
+    }
+
+    //try double smart substitution
+    if(try_double_smart_substitution)
+    {
+      cur_password_i = 0;
+      cur_char_i = 0;
+      cur_password_ii = 0;
+      cur_char_ii = 0;
+      done = 0;
+      //pre populate with valid first position
+      sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
+      while(sub_i == '\0' && !done)
       {
         cur_char_i = 0;
         cur_password_i++;
-        if(cur_password_i >= og_password_len+1)
+        if(cur_password_i >= og_password_len)
           done = 1;
+        else
+          sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
       }
-      buff_i = appendPassword(new_password, buff, buff_i, fp);
+      //pre populate with valid second position
+      cur_password_ii = cur_password_i+1;
+      sub_ii = smart_sub(cur_char_ii, new_password[cur_password_ii]);
+      while(sub_ii == '\0' && !done)
+      {
+        cur_char_ii = 0;
+        cur_password_ii++;
+        if(cur_password_ii >= og_password_len)
+          done = 1;
+        else
+          sub_ii = smart_sub(cur_char_ii, new_password[cur_password_ii]);
+      }
+      while(!done)
+      //for(int i = 0; i < substitution_attempts; i++)
+      {
+        strcpy(new_password,og_password);
+        new_password[og_password_len] = '\n';
+        new_password[og_password_len+1] = '\0';
+
+        sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
+        old_i = new_password[cur_password_i];
+        new_password[cur_password_i] = sub_i;
+        sub_ii = smart_sub(cur_char_ii, new_password[cur_password_ii]);
+        old_ii = new_password[cur_password_ii];
+        new_password[cur_password_ii] = sub_ii;
+        buff_i = appendPassword(new_password, buff, buff_i, fp);
+        new_password[cur_password_i] = old_i;
+        new_password[cur_password_ii] = old_ii;
+
+        cur_char_ii++;
+        sub_ii = smart_sub(cur_char_ii, new_password[cur_password_ii]);
+        while(sub_ii == '\0' && !done)
+        {
+          cur_char_ii = 0;
+          cur_password_ii++;
+          if(cur_password_ii == cur_password_i) cur_password_ii++;
+          if(cur_password_ii >= og_password_len)
+          {
+
+            //increment _i
+            cur_char_i++;
+            sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
+            while(sub_i == '\0' && !done)
+            {
+              cur_char_i = 0;
+              cur_password_i++;
+              if(cur_password_i >= og_password_len)
+                done = 1;
+              else
+                sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
+            }
+
+            //increment _ii to valid, non_i spot
+            cur_password_ii = 0;
+            if(cur_password_ii == cur_password_i) cur_password_ii++;
+            cur_char_ii = 0;
+            sub_ii = smart_sub(cur_char_ii, new_password[cur_password_ii]);
+            while(sub_ii == '\0' && !done)
+            {
+              cur_char_ii = 0;
+              cur_password_ii++;
+              if(cur_password_ii == cur_password_i) cur_password_ii++;
+              if(cur_password_ii >= og_password_len)
+                done = 1;
+              else
+                sub_ii = smart_sub(cur_char_i, new_password[cur_password_i]);
+            }
+
+          }
+          else
+            sub_ii = smart_sub(cur_char_i, new_password[cur_password_i]);
+        }
+      }
     }
 
     //try double substitution
-    cur_password_i = 0;
-    cur_char_i = 0;
-    cur_password_ii = 1;
-    cur_char_ii = 0;
-    done = 0;
-    while(!done)
-    //for(int i = 0; i < double_substitution_attempts; i++)
+    if(try_double_substitution)
     {
-      strcpy(new_password,og_password);
-      new_password[og_password_len] = '\n';
-      new_password[og_password_len+1] = '\0';
-
-      new_password[cur_password_i] = valid_chars[cur_char_i];
-      new_password[cur_password_ii] = valid_chars[cur_char_ii];
-
-      cur_char_ii++;
-
-      if(cur_char_ii >= n_valid_chars)
+      cur_password_i = 0;
+      cur_char_i = 0;
+      cur_password_ii = 1;
+      cur_char_ii = 0;
+      done = 0;
+      while(!done)
+      //for(int i = 0; i < double_substitution_attempts; i++)
       {
-        cur_char_ii = 0;
-        cur_password_ii++;
-        if(cur_password_i == cur_password_ii) cur_password_ii++;
-        if(cur_password_ii >= og_password_len)
+        strcpy(new_password,og_password);
+        new_password[og_password_len] = '\n';
+        new_password[og_password_len+1] = '\0';
+
+        new_password[cur_password_i] = valid_chars[cur_char_i];
+        new_password[cur_password_ii] = valid_chars[cur_char_ii];
+
+        cur_char_ii++;
+
+        if(cur_char_ii >= n_valid_chars)
         {
-          cur_password_ii = 0;
+          cur_char_ii = 0;
+          cur_password_ii++;
           if(cur_password_i == cur_password_ii) cur_password_ii++;
-          cur_char_i++;
-          if(cur_char_i >= n_valid_chars)
+          if(cur_password_ii >= og_password_len)
           {
-            cur_char_i = 0;
-            cur_password_i++;
-            if(cur_password_i >= og_password_len)
-              done = 1;
+            cur_password_ii = 0;
+            if(cur_password_i == cur_password_ii) cur_password_ii++;
+            cur_char_i++;
+            if(cur_char_i >= n_valid_chars)
+            {
+              cur_char_i = 0;
+              cur_password_i++;
+              if(cur_password_i >= og_password_len)
+                done = 1;
+            }
           }
         }
-      }
 
-      buff_i = appendPassword(new_password, buff, buff_i, fp);
+        buff_i = appendPassword(new_password, buff, buff_i, fp);
+      }
     }
 
     //try substitution injection
-    cur_password_i = 0;
-    cur_char_i = 0;
-    cur_password_ii = 1;
-    cur_char_ii = 0;
-    done = 0;
-    while(!done)
-    //for(int i = 0; i < substitution_injection_attempts; i++)
+    if(try_substitution_injection)
     {
-      strcpy(new_password,og_password);
-      new_password[og_password_len] = '\n';
-      new_password[og_password_len+1] = '\0';
-
-      new_password[cur_password_i] = valid_chars[cur_char_i];
-
-      char tmp = new_password[cur_password_ii];
-      char newtmp;
-      for(int j = cur_password_ii; new_password[j] != '\0'; j++)
+      cur_password_i = 0;
+      cur_char_i = 0;
+      cur_password_ii = 1;
+      cur_char_ii = 0;
+      done = 0;
+      while(!done)
+      //for(int i = 0; i < substitution_injection_attempts; i++)
       {
-        newtmp = new_password[j+1];
-        new_password[j+1] = tmp;
-        tmp = newtmp;
-      }
-      new_password[cur_password_ii] = valid_chars[cur_char_ii];
-      cur_char_ii++;
-      if(cur_char_ii >= n_valid_chars)
-      {
-        cur_char_ii = 0;
-        cur_password_ii++;
-        if(cur_password_ii >= og_password_len+1)
+        strcpy(new_password,og_password);
+        new_password[og_password_len] = '\n';
+        new_password[og_password_len+1] = '\0';
+
+        new_password[cur_password_i] = valid_chars[cur_char_i];
+
+        char tmp = new_password[cur_password_ii];
+        char newtmp;
+        for(int j = cur_password_ii; new_password[j] != '\0'; j++)
         {
-          cur_password_ii = 0;
-          cur_char_i++;
-          if(cur_char_i >= n_valid_chars)
+          newtmp = new_password[j+1];
+          new_password[j+1] = tmp;
+          tmp = newtmp;
+        }
+        new_password[cur_password_ii] = valid_chars[cur_char_ii];
+        cur_char_ii++;
+        if(cur_char_ii >= n_valid_chars)
+        {
+          cur_char_ii = 0;
+          cur_password_ii++;
+          if(cur_password_ii >= og_password_len+1)
           {
-            cur_char_i = 0;
-            cur_password_i++;
-            if(cur_password_i >= og_password_len)
-              done = 1;
+            cur_password_ii = 0;
+            cur_char_i++;
+            if(cur_char_i >= n_valid_chars)
+            {
+              cur_char_i = 0;
+              cur_password_i++;
+              if(cur_password_i >= og_password_len)
+                done = 1;
+            }
           }
         }
+        buff_i = appendPassword(new_password, buff, buff_i, fp);
       }
-      buff_i = appendPassword(new_password, buff, buff_i, fp);
     }
-    */
 
+    //basic combinatorics
     cur_og_password_3++;
     if(cur_og_password_3 >= n_og_password_3)
     {
@@ -312,6 +550,7 @@ int main(int argc, char **argv)
         }
       }
     }
+
   }
 
   fwrite(buff,sizeof(char),buff_i,fp);
