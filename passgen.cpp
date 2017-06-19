@@ -44,7 +44,7 @@ char smart_sub(int i, char key)
     case 'i': c = "I!"; break;
     case 'j': c = "J"; break;
     case 'k': c = "K"; break;
-    case 'l': c = "L!Ii"; break;
+    case 'l': c = "L!Ii7"; break;
     case 'm': c = "M"; break;
     case 'n': c = "N"; break;
     case 'o': c = "O0"; break;
@@ -70,7 +70,7 @@ char smart_sub(int i, char key)
     case 'I': c = "i!"; break;
     case 'J': c = "j"; break;
     case 'K': c = "k"; break;
-    case 'L': c = "l!Ii"; break;
+    case 'L': c = "l!Ii7"; break;
     case 'M': c = "m"; break;
     case 'N': c = "n"; break;
     case 'O': c = "o0"; break;
@@ -92,7 +92,7 @@ char smart_sub(int i, char key)
     case '4': c = "A"; break;
     case '5': c = "Ss"; break;
     case '6': c = ""; break;
-    case '7': c = "L"; break;
+    case '7': c = "Ll"; break;
     case '8': c = ""; break;
     case '9': c = ""; break;
     default: c = ""; break;
