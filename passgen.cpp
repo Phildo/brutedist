@@ -194,7 +194,8 @@ int main(int argc, char **argv)
   int try_double_smart_substitution = 0;
   int try_double_substitution       = 0;
   int try_double_injection          = 0;
-  int try_substitution_injection    = 1;
+  int try_substitution_injection    = 0;
+  int try_triple_smart_substitution = 1;
 
   FILE *fp;
   fp = fopen("password.txt", "w+");
@@ -282,12 +283,10 @@ int main(int argc, char **argv)
 
   int cur_password_i = 0;
   int cur_password_ii = 0;
+  int cur_password_iii = 0;
   int cur_char_i = 0;
   int cur_char_ii = 0;
-  char sub_i;
-  char old_i;
-  char sub_ii;
-  char old_ii;
+  int cur_char_iii = 0;
   int done = 0;
 
   int fully_done = 0;
@@ -549,6 +548,60 @@ int main(int argc, char **argv)
           }
         }
         buff_i = appendPassword(new_password, buff, buff_i, fp);
+      }
+    }
+
+    //try triple smart substitution
+    if(try_triple_smart_substitution)
+    {
+      cur_password_i = 0;
+      cur_char_i = 0;
+      done = !find_valid_smart_substitution(cur_password_i, cur_char_i, og_password, &cur_password_i, &cur_char_i);
+      while(!done)
+      {
+        strcpy(tmp_og_password,og_password);
+        basic_smart_substitute(cur_password_i, cur_char_i, tmp_og_password);
+
+        cur_password_ii = cur_password_i+1;
+        cur_char_ii = 0;
+        done = !find_valid_smart_substitution(cur_password_ii, cur_char_ii, tmp_og_password, &cur_password_ii, &cur_char_ii);
+        while(!done)
+        {
+          strcpy(tmp_tmp_og_password,tmp_og_password);
+          basic_smart_substitute(cur_password_ii, cur_char_ii, tmp_tmp_og_password);
+
+          cur_password_iii = cur_password_ii+1;
+          cur_char_iii = 0;
+          done = !find_valid_smart_substitution(cur_password_iii, cur_char_iii, tmp_tmp_og_password, &cur_password_iii, &cur_char_iii);
+          while(!done)
+          {
+            strcpy(new_password,tmp_tmp_og_password);
+            new_password[og_password_len] = '\n';
+            new_password[og_password_len+1] = '\0';
+
+            basic_smart_substitute(cur_password_iii, cur_char_iii, new_password);
+            buff_i = appendPassword(new_password, buff, buff_i, fp);
+
+            cur_char_iii++;
+            done = !find_valid_smart_substitution(cur_password_iii, cur_char_iii, tmp_tmp_og_password, &cur_password_iii, &cur_char_iii);
+            while(!done && cur_password_iii == cur_password_ii)
+            {
+              cur_char_iii++;
+              done = !find_valid_smart_substitution(cur_password_iii, cur_char_iii, tmp_tmp_og_password, &cur_password_iii, &cur_char_iii);
+            }
+          }
+
+          cur_char_ii++;
+          done = !find_valid_smart_substitution(cur_password_ii, cur_char_ii, tmp_og_password, &cur_password_ii, &cur_char_ii);
+          while(!done && cur_password_ii == cur_password_i)
+          {
+            cur_char_ii++;
+            done = !find_valid_smart_substitution(cur_password_ii, cur_char_ii, tmp_og_password, &cur_password_ii, &cur_char_ii);
+          }
+        }
+
+        cur_char_i++;
+        done = !find_valid_smart_substitution(cur_password_i, cur_char_i, og_password, &cur_password_i, &cur_char_i);
       }
     }
 
