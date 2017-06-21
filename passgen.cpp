@@ -100,15 +100,101 @@ char smart_sub(int i, char key)
   return c[i];
 }
 
+int find_valid_delete(int i, char *s, int *ri)
+{
+  if(s[i] == '\0' || s[i] == '\n')
+    return 0;
+  return 1;
+}
+
+void basic_delete(int i, char *s)
+{
+  for(int j = i; s[j] != '\0'; j++)
+    s[j] = s[j+1];
+}
+
+int find_valid_smart_substitution(int i, int sub_i, char *s, int *ri, int *rsub_i)
+{
+  if(s[i] == '\0' || s[i] == '\n')
+    return 0;
+  char sub_char = smart_sub(sub_i, s[i]);
+  while(sub_char == '\0')
+  {
+    sub_i = 0;
+    i++;
+    if(s[i] == '\0' || s[i] == '\n')
+      return 0;
+    else
+      sub_char = smart_sub(sub_i, s[i]);
+  }
+  *ri = i;
+  *rsub_i = sub_i;
+  return 1;
+}
+
+void basic_smart_substitute(int i, int sub_i, char *s)
+{
+  s[i] = smart_sub(sub_i, s[i]);
+}
+
+int find_valid_substitution(int i, char *set, int set_i, char *s, int *ri, int *rset_i)
+{
+  if(s[i] == '\0' || s[i] == '\n')
+    return 0;
+  if(set[set_i] == '\0')
+  {
+    set_i = 0;
+    i++;
+    if(s[i] == '\0' || s[i] == '\n')
+      return 0;
+  }
+  *ri = i;
+  *rset_i = set_i;
+  return 1;
+}
+
+void basic_substitute(int i, char *set, int set_i, char *s)
+{
+  s[i] = set[set_i];
+}
+
+int find_valid_inject(int i, char *set, int set_i, char *s, int *ri, int *rset_i)
+{
+  if(set[set_i] == '\0')
+  {
+    set_i = 0;
+    i++;
+    if(s[i-1] == '\0' || s[i-1] == '\n')
+      return 0;
+  }
+  *ri = i;
+  *rset_i = set_i;
+  return 1;
+}
+
+void basic_inject(int i, char *set, int set_i, char *s)
+{
+  char tmp = s[i];
+  char newtmp;
+  for(int j = i; s[j] != '\0'; j++)
+  {
+    newtmp = s[j+1];
+    s[j+1] = tmp;
+    tmp = newtmp;
+  }
+  s[i] = set[set_i];
+}
+
 int main(int argc, char **argv)
 {
   int try_deletion                  = 0;
-  int try_smart_substitution        = 1;
+  int try_smart_substitution        = 0;
   int try_substitution              = 0;
   int try_injection                 = 0;
-  int try_double_smart_substitution = 1;
+  int try_double_smart_substitution = 0;
   int try_double_substitution       = 0;
-  int try_substitution_injection    = 0;
+  int try_double_injection          = 0;
+  int try_substitution_injection    = 1;
 
   FILE *fp;
   fp = fopen("password.txt", "w+");
@@ -188,6 +274,10 @@ int main(int argc, char **argv)
 
   char og_password[300]; //gets populated with every permutation of og_password_0og_password_1og_password_2og_password_3
   int og_password_len;
+  char tmp_og_password[300]; //used for recursion
+  int tmp_og_password_len;
+  char tmp_tmp_og_password[300]; //used for double recursion
+  int tmp_tmp_og_password_len;
   char new_password[300];
 
   int cur_password_i = 0;
@@ -226,19 +316,16 @@ int main(int argc, char **argv)
       cur_password_i = 0;
       done = 0;
       while(!done)
-      //for(int i = 0; i < deletion_attempts; i++)
       {
         strcpy(new_password,og_password);
         new_password[og_password_len] = '\n';
         new_password[og_password_len+1] = '\0';
 
-        for(int j = cur_password_i; new_password[j] != '\0'; j++)
-          new_password[j] = new_password[j+1];
-        cur_password_i++;
-        if(cur_password_i >= og_password_len)
-          done = 1;
-
+        basic_delete(cur_password_i, new_password);
         buff_i = appendPassword(new_password, buff, buff_i, fp);
+
+        cur_password_i++;
+        done = !find_valid_delete(cur_password_i, og_password, &cur_password_i);
       }
     }
 
@@ -247,42 +334,18 @@ int main(int argc, char **argv)
     {
       cur_password_i = 0;
       cur_char_i = 0;
-      done = 0;
-      //pre populate with valid positions
-      sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
-      while(sub_i == '\0' && !done)
-      {
-        cur_char_i = 0;
-        cur_password_i++;
-        if(cur_password_i >= og_password_len)
-          done = 1;
-        else
-          sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
-      }
+      done = !find_valid_smart_substitution(cur_password_i, cur_char_i, og_password, &cur_password_i, &cur_char_i);
       while(!done)
-      //for(int i = 0; i < substitution_attempts; i++)
       {
         strcpy(new_password,og_password);
         new_password[og_password_len] = '\n';
         new_password[og_password_len+1] = '\0';
 
-        sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
-        old_i = new_password[cur_password_i];
-        new_password[cur_password_i] = sub_i;
+        basic_smart_substitute(cur_password_i, cur_char_i, new_password);
         buff_i = appendPassword(new_password, buff, buff_i, fp);
-        new_password[cur_password_i] = old_i;
 
         cur_char_i++;
-        sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
-        while(sub_i == '\0' && !done)
-        {
-          cur_char_i = 0;
-          cur_password_i++;
-          if(cur_password_i >= og_password_len)
-            done = 1;
-          else
-            sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
-        }
+        done = !find_valid_smart_substitution(cur_password_i, cur_char_i, og_password, &cur_password_i, &cur_char_i);
       }
     }
 
@@ -293,22 +356,16 @@ int main(int argc, char **argv)
       cur_char_i = 0;
       done = 0;
       while(!done)
-      //for(int i = 0; i < substitution_attempts; i++)
       {
         strcpy(new_password,og_password);
         new_password[og_password_len] = '\n';
         new_password[og_password_len+1] = '\0';
 
-        new_password[cur_password_i] = valid_chars[cur_char_i];
-        cur_char_i++;
-        if(cur_char_i >= n_valid_chars)
-        {
-          cur_char_i = 0;
-          cur_password_i++;
-          if(cur_password_i >= og_password_len)
-            done = 1;
-        }
+        basic_substitute(cur_password_i, valid_chars, cur_char_i, new_password);
         buff_i = appendPassword(new_password, buff, buff_i, fp);
+
+        cur_char_i++;
+        done = !find_valid_substitution(cur_password_i, valid_chars, cur_char_i, og_password, &cur_password_i, &cur_char_i);
       }
     }
 
@@ -319,30 +376,16 @@ int main(int argc, char **argv)
       cur_char_i = 0;
       done = 0;
       while(!done)
-      //for(int i = 0; i < injection_attempts; i++)
       {
         strcpy(new_password,og_password);
         new_password[og_password_len] = '\n';
         new_password[og_password_len+1] = '\0';
 
-        char tmp = new_password[cur_password_i];
-        char newtmp;
-        for(int j = cur_password_i; new_password[j] != '\0'; j++)
-        {
-          newtmp = new_password[j+1];
-          new_password[j+1] = tmp;
-          tmp = newtmp;
-        }
-        new_password[cur_password_i] = valid_chars[cur_char_i];
-        cur_char_i++;
-        if(cur_char_i >= n_valid_chars)
-        {
-          cur_char_i = 0;
-          cur_password_i++;
-          if(cur_password_i >= og_password_len+1)
-            done = 1;
-        }
+        basic_inject(cur_password_i, valid_chars, cur_char_i, new_password);
         buff_i = appendPassword(new_password, buff, buff_i, fp);
+
+        cur_char_i++;
+        done = !find_valid_inject(cur_password_i, valid_chars, cur_char_i, og_password, &cur_password_i, &cur_char_i);
       }
     }
 
@@ -351,92 +394,35 @@ int main(int argc, char **argv)
     {
       cur_password_i = 0;
       cur_char_i = 0;
-      cur_password_ii = 0;
-      cur_char_ii = 0;
-      done = 0;
-      //pre populate with valid first position
-      sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
-      while(sub_i == '\0' && !done)
-      {
-        cur_char_i = 0;
-        cur_password_i++;
-        if(cur_password_i >= og_password_len)
-          done = 1;
-        else
-          sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
-      }
-      //pre populate with valid second position
-      cur_password_ii = cur_password_i+1;
-      sub_ii = smart_sub(cur_char_ii, new_password[cur_password_ii]);
-      while(sub_ii == '\0' && !done)
-      {
-        cur_char_ii = 0;
-        cur_password_ii++;
-        if(cur_password_ii >= og_password_len)
-          done = 1;
-        else
-          sub_ii = smart_sub(cur_char_ii, new_password[cur_password_ii]);
-      }
+      done = !find_valid_smart_substitution(cur_password_i, cur_char_i, og_password, &cur_password_i, &cur_char_i);
       while(!done)
-      //for(int i = 0; i < substitution_attempts; i++)
       {
-        strcpy(new_password,og_password);
-        new_password[og_password_len] = '\n';
-        new_password[og_password_len+1] = '\0';
+        strcpy(tmp_og_password,og_password);
+        basic_smart_substitute(cur_password_i, cur_char_i, tmp_og_password);
 
-        sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
-        old_i = new_password[cur_password_i];
-        new_password[cur_password_i] = sub_i;
-        sub_ii = smart_sub(cur_char_ii, new_password[cur_password_ii]);
-        old_ii = new_password[cur_password_ii];
-        new_password[cur_password_ii] = sub_ii;
-        buff_i = appendPassword(new_password, buff, buff_i, fp);
-        new_password[cur_password_i] = old_i;
-        new_password[cur_password_ii] = old_ii;
-
-        cur_char_ii++;
-        sub_ii = smart_sub(cur_char_ii, new_password[cur_password_ii]);
-        while(sub_ii == '\0' && !done)
+        cur_password_ii = cur_password_i+1;
+        cur_char_ii = 0;
+        done = !find_valid_smart_substitution(cur_password_ii, cur_char_ii, tmp_og_password, &cur_password_ii, &cur_char_ii);
+        while(!done)
         {
-          cur_char_ii = 0;
-          cur_password_ii++;
-          if(cur_password_ii == cur_password_i) cur_password_ii++;
-          if(cur_password_ii >= og_password_len)
+          strcpy(new_password,tmp_og_password);
+          new_password[og_password_len] = '\n';
+          new_password[og_password_len+1] = '\0';
+
+          basic_smart_substitute(cur_password_ii, cur_char_ii, new_password);
+          buff_i = appendPassword(new_password, buff, buff_i, fp);
+
+          cur_char_ii++;
+          done = !find_valid_smart_substitution(cur_password_ii, cur_char_ii, tmp_og_password, &cur_password_ii, &cur_char_ii);
+          while(!done && cur_password_ii == cur_password_i)
           {
-
-            //increment _i
-            cur_char_i++;
-            sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
-            while(sub_i == '\0' && !done)
-            {
-              cur_char_i = 0;
-              cur_password_i++;
-              if(cur_password_i >= og_password_len)
-                done = 1;
-              else
-                sub_i = smart_sub(cur_char_i, new_password[cur_password_i]);
-            }
-
-            //increment _ii to valid, non_i spot
-            cur_password_ii = 0;
-            if(cur_password_ii == cur_password_i) cur_password_ii++;
-            cur_char_ii = 0;
-            sub_ii = smart_sub(cur_char_ii, new_password[cur_password_ii]);
-            while(sub_ii == '\0' && !done)
-            {
-              cur_char_ii = 0;
-              cur_password_ii++;
-              if(cur_password_ii == cur_password_i) cur_password_ii++;
-              if(cur_password_ii >= og_password_len)
-                done = 1;
-              else
-                sub_ii = smart_sub(cur_char_i, new_password[cur_password_i]);
-            }
-
+            cur_char_ii++;
+            done = !find_valid_smart_substitution(cur_password_ii, cur_char_ii, tmp_og_password, &cur_password_ii, &cur_char_ii);
           }
-          else
-            sub_ii = smart_sub(cur_char_i, new_password[cur_password_i]);
         }
+
+        cur_char_i++;
+        done = !find_valid_smart_substitution(cur_password_i, cur_char_i, og_password, &cur_password_i, &cur_char_i);
       }
     }
 
@@ -445,42 +431,77 @@ int main(int argc, char **argv)
     {
       cur_password_i = 0;
       cur_char_i = 0;
-      cur_password_ii = 1;
-      cur_char_ii = 0;
       done = 0;
       while(!done)
-      //for(int i = 0; i < double_substitution_attempts; i++)
       {
-        strcpy(new_password,og_password);
-        new_password[og_password_len] = '\n';
-        new_password[og_password_len+1] = '\0';
+        strcpy(tmp_og_password,og_password);
+        basic_substitute(cur_password_i, valid_chars, cur_char_i, tmp_og_password);
 
-        new_password[cur_password_i] = valid_chars[cur_char_i];
-        new_password[cur_password_ii] = valid_chars[cur_char_ii];
-
-        cur_char_ii++;
-
-        if(cur_char_ii >= n_valid_chars)
+        cur_password_ii = cur_password_i+1;
+        cur_char_ii = 0;
+        done = !find_valid_substitution(cur_password_ii, valid_chars, cur_char_ii, tmp_og_password, &cur_password_ii, &cur_char_ii);
+        while(!done)
         {
-          cur_char_ii = 0;
-          cur_password_ii++;
-          if(cur_password_i == cur_password_ii) cur_password_ii++;
-          if(cur_password_ii >= og_password_len)
+          strcpy(new_password,tmp_og_password);
+          new_password[og_password_len] = '\n';
+          new_password[og_password_len+1] = '\0';
+
+          basic_substitute(cur_password_ii, valid_chars, cur_char_ii, new_password);
+          buff_i = appendPassword(new_password, buff, buff_i, fp);
+
+          cur_char_ii++;
+          done = !find_valid_substitution(cur_password_ii, valid_chars, cur_char_ii, tmp_og_password, &cur_password_ii, &cur_char_ii);
+          while(!done && cur_password_ii == cur_password_i)
           {
-            cur_password_ii = 0;
-            if(cur_password_i == cur_password_ii) cur_password_ii++;
-            cur_char_i++;
-            if(cur_char_i >= n_valid_chars)
-            {
-              cur_char_i = 0;
-              cur_password_i++;
-              if(cur_password_i >= og_password_len)
-                done = 1;
-            }
+            cur_char_ii++;
+            done = !find_valid_substitution(cur_password_ii, valid_chars, cur_char_ii, tmp_og_password, &cur_password_ii, &cur_char_ii);
           }
         }
 
-        buff_i = appendPassword(new_password, buff, buff_i, fp);
+        cur_char_i++;
+        done = !find_valid_substitution(cur_password_i, valid_chars, cur_char_i, og_password, &cur_password_i, &cur_char_i);
+      }
+    }
+
+    //try double injection
+    if(try_double_injection)
+    {
+      cur_password_i = 0;
+      cur_char_i = 0;
+      done = 0;
+      while(!done)
+      {
+        strcpy(tmp_og_password,og_password);
+        basic_inject(cur_password_i, valid_chars, cur_char_i, tmp_og_password);
+
+        cur_password_ii = 0;
+        cur_char_ii = 0;
+        done = !find_valid_inject(cur_password_ii, valid_chars, cur_char_ii, tmp_og_password, &cur_password_ii, &cur_char_ii);
+        while(!done && cur_password_ii == cur_password_i)
+        {
+          cur_char_ii++;
+          done = !find_valid_inject(cur_password_ii, valid_chars, cur_char_ii, tmp_og_password, &cur_password_ii, &cur_char_ii);
+        }
+        while(!done)
+        {
+          strcpy(new_password,tmp_og_password);
+          new_password[og_password_len+1] = '\n';
+          new_password[og_password_len+2] = '\0';
+
+          basic_inject(cur_password_ii, valid_chars, cur_char_ii, new_password);
+          buff_i = appendPassword(new_password, buff, buff_i, fp);
+
+          cur_char_ii++;
+          done = !find_valid_inject(cur_password_ii, valid_chars, cur_char_ii, tmp_og_password, &cur_password_ii, &cur_char_ii);
+          while(!done && cur_password_ii == cur_password_i)
+          {
+            cur_char_ii++;
+            done = !find_valid_inject(cur_password_ii, valid_chars, cur_char_ii, tmp_og_password, &cur_password_ii, &cur_char_ii);
+          }
+        }
+
+        cur_char_i++;
+        done = !find_valid_inject(cur_password_i, valid_chars, cur_char_i, og_password, &cur_password_i, &cur_char_i);
       }
     }
 
@@ -493,7 +514,6 @@ int main(int argc, char **argv)
       cur_char_ii = 0;
       done = 0;
       while(!done)
-      //for(int i = 0; i < substitution_injection_attempts; i++)
       {
         strcpy(new_password,og_password);
         new_password[og_password_len] = '\n';
