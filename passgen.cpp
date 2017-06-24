@@ -39,7 +39,7 @@ char smart_sub(int i, char key)
     case 'd': c = "D"; break;
     case 'e': c = "E3"; break;
     case 'f': c = "F"; break;
-    case 'g': c = "G"; break;
+    case 'g': c = "G9"; break;
     case 'h': c = "H"; break;
     case 'i': c = "I!1"; break;
     case 'j': c = "J"; break;
@@ -58,14 +58,14 @@ char smart_sub(int i, char key)
     case 'w': c = "W"; break;
     case 'x': c = "X"; break;
     case 'y': c = "Y"; break;
-    case 'z': c = "Z"; break;
+    case 'z': c = "Z2"; break;
     case 'A': c = "a4"; break;
     case 'B': c = "b"; break;
     case 'C': c = "c"; break;
     case 'D': c = "d"; break;
     case 'E': c = "e3"; break;
     case 'F': c = "f"; break;
-    case 'G': c = "g"; break;
+    case 'G': c = "g9"; break;
     case 'H': c = "h"; break;
     case 'I': c = "i!1"; break;
     case 'J': c = "j"; break;
@@ -84,17 +84,17 @@ char smart_sub(int i, char key)
     case 'W': c = "w"; break;
     case 'X': c = "x"; break;
     case 'Y': c = "y"; break;
-    case 'Z': c = "z"; break;
+    case 'Z': c = "z2"; break;
     case '0': c = "oO"; break;
-    case '1': c = "i!"; break;
+    case '1': c = "Ii!"; break;
     case '2': c = "zZ"; break;
     case '3': c = "eE"; break;
-    case '4': c = "A"; break;
+    case '4': c = "Aa"; break;
     case '5': c = "Ss"; break;
     case '6': c = ""; break;
     case '7': c = "Ll"; break;
     case '8': c = ""; break;
-    case '9': c = ""; break;
+    case '9': c = "g"; break;
     default: c = ""; break;
   }
   return c[i];
@@ -187,15 +187,15 @@ void basic_inject(int i, char *set, int set_i, char *s)
 
 int main(int argc, char **argv)
 {
-  int try_deletion                  = 0;
+  int try_deletion                  = 1;
   int try_smart_substitution        = 0;
-  int try_substitution              = 0;
-  int try_injection                 = 0;
+  int try_substitution              = 1;
+  int try_injection                 = 1;
   int try_double_smart_substitution = 1;
   int try_double_substitution       = 0;
   int try_double_injection          = 0;
   int try_substitution_injection    = 0;
-  int try_triple_smart_substitution = 0;
+  int try_triple_smart_substitution = 1;
 
   FILE *fp;
   fp = fopen("password.txt", "w+");
