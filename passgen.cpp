@@ -41,10 +41,10 @@ char smart_sub(int i, char key)
     case 'f': c = "F"; break;
     case 'g': c = "G"; break;
     case 'h': c = "H"; break;
-    case 'i': c = "I!"; break;
+    case 'i': c = "I!1"; break;
     case 'j': c = "J"; break;
     case 'k': c = "K"; break;
-    case 'l': c = "L!Ii7"; break;
+    case 'l': c = "L!Ii71"; break;
     case 'm': c = "M"; break;
     case 'n': c = "N"; break;
     case 'o': c = "O0"; break;
@@ -67,10 +67,10 @@ char smart_sub(int i, char key)
     case 'F': c = "f"; break;
     case 'G': c = "g"; break;
     case 'H': c = "h"; break;
-    case 'I': c = "i!"; break;
+    case 'I': c = "i!1"; break;
     case 'J': c = "j"; break;
     case 'K': c = "k"; break;
-    case 'L': c = "l!Ii7"; break;
+    case 'L': c = "l!Ii71"; break;
     case 'M': c = "m"; break;
     case 'N': c = "n"; break;
     case 'O': c = "o0"; break;
@@ -191,11 +191,11 @@ int main(int argc, char **argv)
   int try_smart_substitution        = 0;
   int try_substitution              = 0;
   int try_injection                 = 0;
-  int try_double_smart_substitution = 0;
+  int try_double_smart_substitution = 1;
   int try_double_substitution       = 0;
   int try_double_injection          = 0;
   int try_substitution_injection    = 0;
-  int try_triple_smart_substitution = 1;
+  int try_triple_smart_substitution = 0;
 
   FILE *fp;
   fp = fopen("password.txt", "w+");
@@ -203,9 +203,10 @@ int main(int argc, char **argv)
   int buff_i = 0;
   char valid_chars[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!";
   int n_valid_chars = strlen(valid_chars);
+
   char *og_password_0[] = { "test" };
   int n_og_password_0 = 1;
-  char *og_password_1[] = {""};
+  char *og_password_1[] = { "" };
   int n_og_password_1 = 1;
 
   /*
