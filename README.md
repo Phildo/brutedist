@@ -2,7 +2,10 @@ This tool was generated as a one-off to help crack someone's ETH wallet password
 
 if you end up using this and successfully unlocking your wallet, please consider donating!
 
-My ETH Wallet:
+My ETH Wallet: 0xef2bebd1059446f3fc83203c24364e65bd42d103
 
 ![0xef2bebd1059446f3fc83203c24364e65bd42d103](https://raw.githubusercontent.com/Phildo/brutedist/master/eth.png)
 
+[ NOTICE: THIS PROJECT IS DEPRECATED!!! ]
+
+A much better, cleaner, faster, more feature rich, easier-to-use version of this tool can be found at github.com:Phildo/expandpass .
